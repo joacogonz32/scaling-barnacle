@@ -20,7 +20,6 @@ public class TicketService {
     }
 
     public Ticket reservar(Ticket ticket) {
-        // Simplemente guardar el ticket y marcarlo como ACTIVA
         ticket.setEstado(Ticket.EstadoTicket.ACTIVA);
         return ticketRepository.save(ticket);
     }
