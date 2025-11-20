@@ -1,6 +1,5 @@
 package com.example.demo.controller;
 
-import com.example.demo.dto.ObraDTO;
 import com.example.demo.dto.VotoRequest;
 import com.example.demo.model.Obra;
 import com.example.demo.model.Valoracion;
@@ -23,15 +22,15 @@ public class ObraController {
         this.obraService = obraService;
         this.valoracionesService = valoracionesService;
     }
-/*
+
     @GetMapping
-    public ResponseEntity<List<ObraDTO>> filtrar(
+    public ResponseEntity<List<Obra>> filtrar(
             @RequestParam(required = false) String ubicacion,
             @RequestParam(required = false) String epoca,
             @RequestParam(required = false) String nombre,
-            @RequestParam(required = false) Float popularidad
+            @RequestParam(required = false, defaultValue = "-1.0") Float popularidad
     ) {
-        List<ObraDTO> obras = obraService.filtrarDTO(ubicacion, epoca, nombre, popularidad);
+        List<Obra> obras = obraService.filtrar(ubicacion, epoca, nombre, popularidad);
         return ResponseEntity.ok(obras);
     }
 
@@ -41,8 +40,6 @@ public class ObraController {
         if (o == null) return ResponseEntity.notFound().build();
         return ResponseEntity.ok(o);
     }
-
- */
 
     @PostMapping("/{id}/votar")
     public ResponseEntity<Valoracion> votar(@PathVariable Long id, @RequestBody VotoRequest body) {

@@ -43,7 +43,8 @@ public class Ticket {
         this.estado = EstadoTicket.ACTIVA;
     }
 
-    // ---------- GETTERS Y SETTERS ----------
+    public Ticket(Usuario usuario, InformacionMuseo info, LocalDate fechaReserva, LocalTime horaReserva, Integer cantidadPersonas, EstadoTicket estadoTicket) {
+    }
 
     public Long getIdTicket() {
         return idTicket;

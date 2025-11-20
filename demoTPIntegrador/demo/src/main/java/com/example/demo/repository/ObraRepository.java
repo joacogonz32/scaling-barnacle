@@ -21,6 +21,6 @@ public interface ObraRepository extends JpaRepository<Obra, Long> {
             @Param("ubicacion") String ubicacion,
             @Param("epoca") String epoca,
             @Param("nombre") String nombre,
-            @Param("popularidad") Float popularidad
+            @Param("popularidad") float popularidad
     );
 }

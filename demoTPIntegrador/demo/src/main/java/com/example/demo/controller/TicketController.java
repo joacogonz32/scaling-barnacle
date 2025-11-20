@@ -55,14 +55,7 @@ public class TicketController {
             LocalTime horaReserva = LocalTime.parse(request.getHora());
             Integer cantidadPersonas = request.getCantidadPersonas();
 
-            Ticket ticket = new Ticket(
-                    usuario,
-                    info,
-                    fechaReserva,
-                    horaReserva,
-                    cantidadPersonas,
-                    Ticket.EstadoTicket.ACTIVA
-            );
+            Ticket ticket = new Ticket(usuario, info, fechaReserva, horaReserva, cantidadPersonas, Ticket.EstadoTicket.ACTIVA);
 
             return ResponseEntity.ok(ticketService.reservar(ticket));
 
