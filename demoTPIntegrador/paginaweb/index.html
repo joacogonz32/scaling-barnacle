@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PoliMet - Museo</title>
+    <!-- Fuentes y Iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <header>
+        <div class="container header-inner">
+            <a href="index.html" class="logo">
+                <div class="logo-icon"><i class="fa-solid fa-landmark"></i></div>
+                PoliMet
+            </a>
+            <nav class="nav-menu">
+                <a href="#">Reseñas</a>
+                <a href="obrasyvisitas.html">Explora</a>
+                <a href="#">Exposiciones</a>
+                <a href="#">Eventos</a>
+                <a href="#">Entradas</a>
+            </nav>
+            <a href="signup.html" class="user-icon"><i class="fa-regular fa-user"></i></a>
+        </div>
+    </header>
+
+    <!-- IMPORTANTE: Pega el link de la foto de la Mona Lisa dentro de las comillas de url('') -->
+    <section class="hero-home" style="background-image: url('');">
+        <div class="hero-overlay"></div> <!-- Filtro oscuro -->
+        
+        <div class="hero-content">
+            <h1>Museo Polimet</h1>
+            <p>En nuestro museo buscamos combinar el arte clásico con lo moderno.</p>
+        </div>
+
+        <!-- Caja flotante derecha -->
+        <div class="hero-card-float">
+            <h3>Bienvenidos al Museo PoliMet</h3>
+            <div class="horarios">
+                De miercoles a domingo<br>
+                Horarios de 09:00 a 21:30
+            </div>
+            <a href="signup.html" class="btn-hero"><i class="fa-solid fa-ticket"></i> Reserva tu entrada</a>
+            <a href="#" class="btn-hero"><i class="fa-solid fa-circle-info"></i> Organiza tu visita</a>
+        </div>
+    </section>
+
+    <!-- TITULO SIMPLE -->
+    <div class="container section-title-box">
+        <h2>Lo mas destacado</h2>
+    </div>
+
+    <!-- SECCION OSCURA (EXPERIENCIA) -->
+    <section class="dark-section">
+        <div class="container">
+            <p class="dark-lead">
+                Cada sección ofrece una experiencia distinta para explorar el arte, la historia y la cultura. Te invitamos a recorrerlas y descubrir todo lo que tenemos para vos.
+            </p>
+
+            <div class="gallery-grid">
+                <!-- Foto 1 -->
+                <div class="gallery-item">
+                    <img src="<!-- PEGAR AQUI LINK FOTO VISITAS GUIADAS -->" alt="Visitas">
+                    <div class="gallery-label">Visitas Guiadas</div>
+                </div>
+                <!-- Foto 2 -->
+                <div class="gallery-item">
+                    <img src="<!-- PEGAR AQUI LINK FOTO EVENTOS -->" alt="Eventos">
+                    <div class="gallery-label">Eventos</div>
+                </div>
+                <!-- Foto 3 -->
+                <div class="gallery-item">
+                    <img src="<!-- PEGAR AQUI LINK FOTO OBRAS -->" alt="Obras">
+                    <div class="gallery-label">Obras</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- MEMBRESIAS -->
+    <section class="membership-section container">
+        <h2>Hay puertas que solo se abren para solo<br>para nuestros miembros</h2>
+        <p>El museo guarda secretos en cada rincón ¿Que hay detras de esa sala cerrada? Nuestras membresias son la llave maestra.</p>
+
+        <div class="stamps-row">
+            <img src="<!-- PEGAR LINK PNG SELLO ESTANDAR -->" class="stamp-img" alt="Estandar">
+            <img src="<!-- PEGAR LINK PNG SELLO PREMIUM -->" class="stamp-img" alt="Premium">
+            <img src="<!-- PEGAR LINK PNG SELLO GOLD -->" class="stamp-img" alt="Gold">
+        </div>
+
+        <button class="btn-dark">MEMBRESIAS <span style="font-size: 0.7rem; display:block; font-weight:400; margin-top:5px; text-transform:none;">Ver membresias</span></button>
+    </section>
+
+    <!-- RESEÑAS -->
+    <section class="container reviews-section">
+        <div class="review-content">
+            <h2>Crea tu propia reseña y cuéntanos tu experiencia</h2>
+            <p>Cada espectador vive una experiencia distinta frente al arte. Tal vez te conmovió una escena, te sorprendió una actuación.</p>
+            <p>¿Qué fue lo que más te impactó o te dejó pensando?</p>
+            
+            <button class="btn-dark" style="margin-top: 20px;">CREA TU RESEÑA</button>
+        </div>
+
+        <div class="review-card">
+            <img src="<!-- PEGAR LINK FOTO MODIGLIANI (MUJER) -->" alt="Reseña">
+            <div class="stars">★★★★★</div>
+            <h3>Figura de mujer</h3>
+            <p style="font-size: 0.85rem; color: #666; margin-top: 5px;">Ayer por fin pude ver la "Figura de mujer"... ¡wow! Es simplemente espectacular.</p>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container" style="display: flex; justify-content: space-between; padding-bottom: 50px;">
+            <div style="flex:1">
+                <h4 style="margin-bottom:20px;">Contacto</h4>
+                <p style="color:#aaa; font-size:0.9rem;">polimetadmin@example.com</p>
+                <p style="color:#aaa; font-size:0.9rem;">+5491178229110</p>
+                <p style="color:#aaa; font-size:0.9rem;">Santo Tome 3215 6B</p>
+            </div>
+            <div style="flex:1">
+                <h4 style="margin-bottom:20px;">Nosotros</h4>
+                <p><a href="#" style="color:#aaa; font-size:0.9rem;">Acerca de</a></p>
+                <p><a href="#" style="color:#aaa; font-size:0.9rem;">Terminos y condiciones</a></p>
+            </div>
+            <div style="flex:1; text-align:right; font-family: 'Playfair Display'; font-size: 1.5rem;">
+                <i class="fa-solid fa-landmark"></i> PoliMet
+            </div>
+        </div>
+        <div class="footer-bottom">
+            © 2025 PoliMet. Todos los derechos reservados
+        </div>
+    </footer>
+
+    <!-- SCRIPT DE SESION -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const usuarioRegistrado = localStorage.getItem('usuarioRegistrado') === 'true';
+            const userIcon = document.querySelector('.user-icon');
+            const headerContainer = document.querySelector('.header-inner');
+
+            if (userIcon && usuarioRegistrado) {
+                userIcon.classList.add('logged-in');
+                userIcon.setAttribute('href', '#');
+
+                const dropdownHTML = `
+                    <div class="dropdown-menu" id="userDropdown">
+                        <ul>
+                            <li><a href="#"><i class="fa-regular fa-user"></i> Perfil</a></li>
+                            <li><a href="#"><i class="fa-solid fa-gear"></i> Configuración</a></li>
+                            <li><a href="membresias.html"><i class="fa-solid fa-crown"></i> Membresías</a></li>
+                            <li><a href="#" id="btnLogout" class="logout-btn"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a></li>
+                        </ul>
+                    </div>
+                `;
+                headerContainer.insertAdjacentHTML('beforeend', dropdownHTML);
+
+                const dropdown = document.getElementById('userDropdown');
+                const btnLogout = document.getElementById('btnLogout');
+
+                userIcon.addEventListener('click', function(e) {
+                    e.preventDefault(); e.stopPropagation();
+                    dropdown.classList.toggle('active');
+                });
+
+                document.addEventListener('click', function(e) {
+                    if (!userIcon.contains(e.target) && !dropdown.contains(e.target)) {
+                        dropdown.classList.remove('active');
+                    }
+                });
+
+                btnLogout.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    localStorage.removeItem('usuarioRegistrado');
+                    window.location.reload();
+                });
+            }
+        });
+    </script>
+</body>
+</html>
