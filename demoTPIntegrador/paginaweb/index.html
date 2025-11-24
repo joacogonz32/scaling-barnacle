@@ -44,12 +44,11 @@
                 De miercoles a domingo<br>
                 Horarios de 09:00 a 21:30
             </div>
-            <a href="signup.html" class="btn-hero"><i class="fa-solid fa-ticket"></i> Reserva tu entrada</a>
-            <a href="#" class="btn-hero"><i class="fa-solid fa-circle-info"></i> Organiza tu visita</a>
+            <a href="entradas.html" class="btn-hero"><i class="fa-solid fa-ticket"></i> Reserva tu entrada</a>
+            <a href="visitas.html" class="btn-hero"><i class="fa-solid fa-circle-info"></i> Organiza tu visita</a>
         </div>
     </section>
 
-    <!-- TITULO SIMPLE -->
     <div class="container section-title-box">
         <h2>Lo mas destacado</h2>
     </div>
@@ -81,7 +80,6 @@
         </div>
     </section>
 
-    <!-- MEMBRESIAS -->
     <section class="membership-section container">
         <h2>Hay puertas que solo se abren para solo<br>para nuestros miembros</h2>
         <p>El museo guarda secretos en cada rincón ¿Que hay detras de esa sala cerrada? Nuestras membresias son la llave maestra.</p>
@@ -91,11 +89,10 @@
             <img src="<!-- PEGAR LINK PNG SELLO PREMIUM -->" class="stamp-img" alt="Premium">
             <img src="<!-- PEGAR LINK PNG SELLO GOLD -->" class="stamp-img" alt="Gold">
         </div>
-
+        
         <button class="btn-dark" onclick="window.location.href='membresias.html'">MEMBRESIAS <span style="font-size: 0.7rem; display:block; font-weight:400; margin-top:5px; text-transform:none;">Ver membresias</span></button>
     </section>
 
-    <!-- RESEÑAS -->
     <section class="container reviews-section">
         <div class="review-content">
             <h2>Crea tu propia reseña y cuéntanos tu experiencia</h2>
@@ -134,10 +131,39 @@
             © 2025 PoliMet. Todos los derechos reservados
         </div>
     </footer>
-
-    <!-- SCRIPT DE SESION -->
     <script>
+        const BASE_URL = 'http://localhost:8080';
+
+        async function cargarContenidoHome() {
+            try {
+                const response = await fetch(`${BASE_URL}/api/home`);
+
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status}`);
+                }
+
+                const data = await response.json();
+                
+                const horariosDiv = document.querySelector('.hero-card-float .horarios');
+                if (horariosDiv && data.horarios) {
+                    horariosDiv.innerHTML = data.horarios.replace(/\n/g, '<br>');
+                }
+                
+                if (data.fotos) {
+                    const heroSection = document.querySelector('.hero-home');
+                    heroSection.style.backgroundImage = `url('${data.fotos}')`;
+                }
+
+            } catch (error) {
+                console.error("Error al cargar la información del museo:", error);
+                
+            }
+        }
+        
         document.addEventListener("DOMContentLoaded", function() {
+            
+            cargarContenidoHome();
+            
             const usuarioRegistrado = localStorage.getItem('usuarioRegistrado') === 'true';
             const userIcon = document.querySelector('.user-icon');
             const headerContainer = document.querySelector('.header-inner');
@@ -175,11 +201,11 @@
                 btnLogout.addEventListener('click', function(e) {
                     e.preventDefault();
                     localStorage.removeItem('usuarioRegistrado');
+                    localStorage.removeItem('idUsuario'); // Importante limpiar el ID
                     window.location.reload();
                 });
             }
         });
     </script>
 </body>
-
 </html>

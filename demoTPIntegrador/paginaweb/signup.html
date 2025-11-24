@@ -90,24 +90,29 @@
     </section>
 
     <footer>
-        <div class="footer-content">
-            <div class="footer-col">
-                <h4>Contacto</h4>
-                <a href="#">polimetadmin@example.com</a>
-                <p>+5491178229110</p>
+        <div class="container" style="display: flex; justify-content: space-between; padding-bottom: 50px;">
+            <div style="flex:1">
+                <h4 style="margin-bottom:20px;">Contacto</h4>
+                <p style="color:#aaa; font-size:0.9rem;">polimetadmin@example.com</p>
+                <p style="color:#aaa; font-size:0.9rem;">+5491178229110</p>
+                <p style="color:#aaa; font-size:0.9rem;">Santo Tome 3215 6B</p>
             </div>
-            <div class="footer-col">
-                <h4>Nosotros</h4>
-                <a href="#">Acerca de</a>
+            <div style="flex:1">
+                <h4 style="margin-bottom:20px;">Nosotros</h4>
+                <p><a href="#" style="color:#aaa; font-size:0.9rem;">Acerca de</a></p>
+                <p><a href="#" style="color:#aaa; font-size:0.9rem;">Terminos y condiciones</a></p>
             </div>
-            <div class="footer-col"><div class="logo"><i class="fa-solid fa-landmark"></i> PoliMet</div></div>
+            <div style="flex:1; text-align:right; font-family: 'Playfair Display'; font-size: 1.5rem;">
+                <i class="fa-solid fa-landmark"></i> PoliMet
+            </div>
         </div>
-        <div class="footer-bottom">© 2025 PoliMet. Todos los derechos reservados</div>
+        <div class="footer-bottom">
+            © 2025 PoliMet. Todos los derechos reservados
+        </div>
     </footer>
 
-    <!-- SCRIPT DE VALIDACIÓN Y FORMATO -->
     <script>
-        // --- 1. REFERENCIAS DOM ---
+        const BASE_URL = 'http://localhost:8080';
         const form = document.getElementById('registroForm');
         const emailInput = document.getElementById('email');
         const passInput = document.getElementById('password');
@@ -115,8 +120,34 @@
         const telInput = document.getElementById('telefono');
         const fechaInput = document.getElementById('fechaNacimiento');
         const paisInput = document.getElementById('pais');
+        
+        async function registrarUsuario(usuarioData) {
+            try {
+                const response = await fetch(`${BASE_URL}/api/usuarios`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(usuarioData),
+                });
 
-        // --- 2. FORMATO TELEFONO (Tu código anterior) ---
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`Registro fallido.`);
+                }
+
+                const usuarioRegistrado = await response.json();
+
+                localStorage.setItem('usuarioRegistrado', 'true');
+                localStorage.setItem('idUsuario', usuarioRegistrado.idUsuario);
+                window.location.href = 'index.html';
+
+            } catch (error) {
+                console.error("Error en el registro:", error.message);
+                alert("Error al crear la cuenta. Verifique que el email no esté ya registrado.");
+            }
+        }
+
         telInput.addEventListener('input', function(e) {
             let valor = this.value.replace(/\D/g, ''); 
             if (valor.length > 11) valor = valor.substring(0, 11);
@@ -130,7 +161,6 @@
             }
         });
 
-        // --- 3. FORMATO FECHA (Tu código anterior) ---
         fechaInput.addEventListener('input', function(e) {
             let valor = this.value.replace(/\D/g, '');
             if (valor.length > 8) valor = valor.substring(0, 8);
@@ -143,13 +173,10 @@
             }
         });
 
-        // --- 4. FORMATO PAIS (Solo letras) ---
         paisInput.addEventListener('input', function(e) {
-            // Reemplaza cualquier cosa que NO sea letra o espacio
             this.value = this.value.replace(/[^a-zA-Z\s]/g, '');
         });
 
-        // --- 5. MOSTRAR/OCULTAR PASSWORD ---
         togglePass.addEventListener('click', function () {
             const type = passInput.getAttribute('type') === 'password' ? 'text' : 'password';
             passInput.setAttribute('type', type);
@@ -157,9 +184,8 @@
             this.classList.toggle('fa-eye-slash');
         });
 
-        // --- 6. FUNCIONES DE ERROR ---
         function mostrarError(input, mensaje) {
-            const formGroup = input.parentElement.parentElement; // Subimos al div .form-group
+            const formGroup = input.parentElement.parentElement; 
             const small = formGroup.querySelector('.error-message');
             small.innerText = mensaje;
             formGroup.classList.add('error');
@@ -175,13 +201,11 @@
             return re.test(String(email).toLowerCase());
         }
 
-        // --- 7. VALIDACIÓN AL ENVIAR (SUBMIT) ---
         form.addEventListener('submit', function(e) {
-            e.preventDefault(); // Evita que se recargue la página
+            e.preventDefault(); 
             
             let esValido = true;
 
-            // A. Validar Email
             if(emailInput.value.trim() === '') {
                 mostrarError(emailInput, 'El email es obligatorio');
                 esValido = false;
@@ -192,7 +216,6 @@
                 limpiarError(emailInput);
             }
 
-            // B. Validar Password
             if(passInput.value.length < 8) {
                 mostrarError(passInput, 'La contraseña debe tener al menos 8 caracteres');
                 esValido = false;
@@ -200,7 +223,6 @@
                 limpiarError(passInput);
             }
 
-            // C. Validar Telefono (Debe tener los 13 caracteres del formato)
             if(telInput.value.length < 13) {
                 mostrarError(telInput, 'Complete el teléfono (cód + número)');
                 esValido = false;
@@ -208,7 +230,6 @@
                 limpiarError(telInput);
             }
 
-            // D. Validar Pais
             if(paisInput.value.trim() === '') {
                 mostrarError(paisInput, 'El país es obligatorio');
                 esValido = false;
@@ -219,16 +240,15 @@
                 limpiarError(paisInput);
             }
 
-            // E. Validar Fecha (Lógica compleja solicitada)
             const fechaStr = fechaInput.value;
+            let anio, mes, dia;
             if(fechaStr.length !== 10) {
                 mostrarError(fechaInput, 'Complete la fecha dd-mm-YYYY');
                 esValido = false;
             } else {
-                const [dia, mes, anio] = fechaStr.split('-').map(Number);
-                const fechaObj = new Date(anio, mes - 1, dia); // Mes en JS es 0-11
+                [dia, mes, anio] = fechaStr.split('-').map(Number);
+                const fechaObj = new Date(anio, mes - 1, dia); 
 
-                // Validaciones especificas
                 if (anio < 1900) {
                     mostrarError(fechaInput, 'El año no puede ser menor a 1900');
                     esValido = false;
@@ -240,7 +260,6 @@
                     fechaObj.getMonth() !== mes - 1 ||
                     fechaObj.getDate() !== dia
                 ) {
-                    // Esto detecta casos como 31-02 (que JS convierte a Marzo automáticamente, entonces no coinciden)
                     mostrarError(fechaInput, 'Día inválido para ese mes');
                     esValido = false;
                 } else {
@@ -248,12 +267,21 @@
                 }
             }
 
+
             if(esValido) {
-                // Guardamos en el navegador que el usuario se registró
-                localStorage.setItem('usuarioRegistrado', 'true');
-                
-                // Redirigimos al inicio
-                window.location.href = 'index.html';
+                const email = emailInput.value.trim();
+                const telefonoLimpio = telInput.value.replace(/\D/g, '');
+
+                const usuario = {
+                    nombre: email.split('@')[0].substring(0, 15), 
+                    email: email,
+                    password: passInput.value,
+                    pais: paisInput.value.trim(),
+                    telefono: Number(telefonoLimpio),
+                    fechaNacimiento: `${anio}-${mes < 10 ? '0' + mes : mes}-${dia < 10 ? '0' + dia : dia}`,
+                };
+
+                registrarUsuario(usuario);
             }
         });
     </script>

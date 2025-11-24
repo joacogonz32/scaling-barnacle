@@ -108,10 +108,12 @@
                 <h4 style="margin-bottom:20px;">Contacto</h4>
                 <p style="color:#aaa; font-size:0.9rem;">polimetadmin@example.com</p>
                 <p style="color:#aaa; font-size:0.9rem;">+5491178229110</p>
+                <p style="color:#aaa; font-size:0.9rem;">Santo Tome 3215 6B</p>
             </div>
             <div style="flex:1">
                 <h4 style="margin-bottom:20px;">Nosotros</h4>
                 <p><a href="#" style="color:#aaa; font-size:0.9rem;">Acerca de</a></p>
+                <p><a href="#" style="color:#aaa; font-size:0.9rem;">Terminos y condiciones</a></p>
             </div>
             <div style="flex:1; text-align:right; font-family: 'Playfair Display'; font-size: 1.5rem;">
                 <i class="fa-solid fa-landmark"></i> PoliMet
@@ -121,10 +123,72 @@
             © 2025 PoliMet. Todos los derechos reservados
         </div>
     </footer>
-
-    <!-- SCRIPT DE SESION (El mismo de siempre) -->
     <script>
+        const BASE_URL = 'http://localhost:8080';
+        async function filtrarObras(filtros) {
+            const params = new URLSearchParams();
+            if (filtros.ubicacion) params.append('ubicacion', filtros.ubicacion);
+            if (filtros.epoca) params.append('epoca', filtros.epoca);
+            if (filtros.nombre) params.append('nombre', filtros.nombre);
+            if (filtros.popularidad) params.append('popularidad', filtros.popularidad);
+            
+            const url = `${BASE_URL}/api/obras?${params.toString()}`;
+
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status}`);
+                }
+
+                const obras = await response.json();
+                console.log("Obras filtradas recibidas:", obras);
+                
+                return obras;
+            } catch (error) {
+                console.error("Error al obtener las obras:", error);
+                return [];
+            }
+        }
+
+        async function votarObra(idObra, puntaje, comentario) {
+            const idUsuario = localStorage.getItem('idUsuario'); 
+            
+            if (!idUsuario) {
+                alert("Debes iniciar sesión para poder votar una obra.");
+                return;
+            }
+
+            const votoRequest = {
+                idUsuario: Number(idUsuario), 
+                puntaje: puntaje, 
+                comentario: comentario
+            };
+
+            try {
+                const response = await fetch(`${BASE_URL}/api/obras/${idObra}/votar`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(votoRequest),
+                });
+
+                if (!response.ok) {
+                    const errorMessage = response.headers.get("Error") || "Error desconocido al votar.";
+                    throw new Error(errorMessage);
+                }
+
+                const valoracionGuardada = await response.json();
+                alert(`¡Voto exitoso! Obra #${idObra} calificada con ${valoracionGuardada.puntaje}. (Se actualizó la popularidad)`);
+
+            } catch (error) {
+                console.error("Error al votar la obra:", error.message);
+                alert("No se pudo registrar el voto: " + error.message);
+            }
+        }
+
         document.addEventListener("DOMContentLoaded", function() {
+
             const usuarioRegistrado = localStorage.getItem('usuarioRegistrado') === 'true';
             const userIcon = document.querySelector('.user-icon');
             const headerContainer = document.querySelector('.header-inner');
@@ -140,8 +204,8 @@
                             <li><a href="#"><i class="fa-solid fa-gear"></i> Configuración</a></li>
                             <li><a href="membresias.html"><i class="fa-solid fa-crown"></i> Membresías</a></li>
                             <li><a href="#" id="btnLogout" class="logout-btn"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a></li>
-                        </ul>
-                    </div>
+                    </ul>
+                </div>
                 `;
                 headerContainer.insertAdjacentHTML('beforeend', dropdownHTML);
 
@@ -162,10 +226,12 @@
                 btnLogout.addEventListener('click', function(e) {
                     e.preventDefault();
                     localStorage.removeItem('usuarioRegistrado');
+                    localStorage.removeItem('idUsuario');
                     window.location.reload();
                 });
             }
         });
+
     </script>
 </body>
 </html>
