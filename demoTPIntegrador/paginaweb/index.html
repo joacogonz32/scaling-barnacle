@@ -201,7 +201,7 @@
                 btnLogout.addEventListener('click', function(e) {
                     e.preventDefault();
                     localStorage.removeItem('usuarioRegistrado');
-                    localStorage.removeItem('idUsuario'); // Importante limpiar el ID
+                    localStorage.removeItem('idUsuario');
                     window.location.reload();
                 });
             }

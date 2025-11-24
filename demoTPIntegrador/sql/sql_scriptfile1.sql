@@ -14,7 +14,6 @@ DROP FUNCTION IF EXISTS fn_total_personas_reservadas_evento;
 DROP EVENT IF EXISTS ev_invalida_tickets_vencidos_midnight;
 DROP EVENT IF EXISTS ev_insertar_recordatorios_6am;
 
--- Devuelve la cantidad total de personas reservadas (estado = 'activa') para un evento dado.
 DELIMITER $$
 CREATE FUNCTION fn_total_personas_reservadas_evento(p_id_evento INT) RETURNS INT
 DETERMINISTIC
@@ -29,16 +28,11 @@ BEGIN
 END$$
 DELIMITER ;
 
--- =========================
--- Trigger: al calificarse una obra -> actualizar su nivel_popularidad
--- (se crean 3 triggers: AFTER INSERT, AFTER UPDATE, AFTER DELETE)
--- =========================
 DELIMITER $$
 CREATE TRIGGER tr_valoraciones_after_insert
 AFTER INSERT ON valoraciones
 FOR EACH ROW
 BEGIN
-  -- Recalcular promedio para la obra recién valorada
   UPDATE obras
     SET nivel_popularidad = (
       SELECT IFNULL(AVG(puntaje),0)
@@ -47,11 +41,11 @@ BEGIN
     )
   WHERE id_obra = NEW.id_obra;
 END$$
+
 CREATE TRIGGER tr_valoraciones_after_update
 AFTER UPDATE ON valoraciones
 FOR EACH ROW
 BEGIN
-  -- Si la valoración cambió de obra, actualizar ambas obras (OLD y NEW) (si aplica)
   IF OLD.id_obra IS NOT NULL THEN
     UPDATE obras
       SET nivel_popularidad = (
@@ -71,11 +65,11 @@ BEGIN
     WHERE id_obra = NEW.id_obra;
   END IF;
 END$$
+
 CREATE TRIGGER tr_valoraciones_after_delete
 AFTER DELETE ON valoraciones
 FOR EACH ROW
 BEGIN
-  -- Recalcular promedio tras eliminación
   UPDATE obras
     SET nivel_popularidad = (
       SELECT IFNULL(AVG(puntaje),0)
@@ -86,63 +80,53 @@ BEGIN
 END$$
 DELIMITER ;
 
--- =========================
--- Trigger: al realizarse una reserva (tickets = reservas) -> chequear disponibilidad
--- Antes de INSERT y antes de UPDATE (para cambios que aumenten la ocupación).
--- Reglas:
---   - suma de cantidad_personas de tickets con estado 'activa' + NEW.cantidad_personas <= eventos.capacidad
---   - en UPDATE, se resta la cantidad del ticket viejo (si existe) y se suma la nueva
--- =========================
--- BEFORE INSERT
 DELIMITER $$
-CREATE TRIGGER tr_tickets_before_insert -- NO SE EJECUTO BIEN (no reconoce message_text)
+CREATE TRIGGER tr_tickets_before_insert
 BEFORE INSERT ON tickets
 FOR EACH ROW
 BEGIN
   DECLARE v_capacidad INT DEFAULT 0;
   DECLARE v_actual INT DEFAULT 0;
+  declare message text;
   IF NEW.id_evento IS NULL THEN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'No se especificó id_evento en la reserva.';
   END IF;
 
-  -- Obtener capacidad del evento
   SELECT capacidad INTO v_capacidad FROM eventos WHERE id_evento = NEW.id_evento;
   IF v_capacidad IS NULL THEN
-    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Evento no encontrado o sin capacidad definida.';
+    SIGNAL SQLSTATE '45000';
+    SET message = 'Evento no encontrado o sin capacidad definida.';
   END IF;
-
-  -- Obtener actuales reservados (estado 'activa')
+  
   SELECT IFNULL(SUM(cantidad_personas),0) INTO v_actual
     FROM tickets
     WHERE id_evento = NEW.id_evento
       AND estado = 'activa';
 
   IF (v_actual + IFNULL(NEW.cantidad_personas,0)) > v_capacidad THEN
-    SIGNAL SQLSTATE '45000'; SET MESSAGE_TEXT = CONCAT('Capacidad insuficiente: capacidad=', v_capacidad, ', ya reservadas=', v_actual);
+    SIGNAL SQLSTATE '45000';
+		SET message = CONCAT('Capacidad insuficiente: capacidad=', v_capacidad, ', ya reservadas=', v_actual);
   END IF;
 END$$
 DELIMITER ;
 
 -- BEFORE UPDATE
 DELIMITER $$
-CREATE TRIGGER tr_tickets_before_update -- NO SE EJECUTO BIEN (no reconoce message_text)
+CREATE TRIGGER tr_tickets_before_update
 BEFORE UPDATE ON tickets
 FOR EACH ROW
 BEGIN
   DECLARE v_capacidad INT DEFAULT 0;
   DECLARE v_actual INT DEFAULT 0;
   DECLARE v_excl_old INT DEFAULT 0;
+  declare message text;
 
-  -- Si el ticket cambia a 'cancelada' o 'vencido' y la cantidad baja, no necesitamos verificar.
-  -- Solo verificar si el ticket quedará con estado 'activa' y/o cambia cantidad_personas o id_evento.
   IF NEW.estado = 'activa' THEN
-    -- Obtener capacidad del evento (para NEW.id_evento)
     SELECT capacidad INTO v_capacidad FROM eventos WHERE id_evento = NEW.id_evento;
     IF v_capacidad IS NULL THEN
-      SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Evento no encontrado o sin capacidad definida (UPDATE).';
+      SIGNAL SQLSTATE '45000'; SET message = 'Evento no encontrado o sin capacidad definida (UPDATE).';
     END IF;
 
-    -- Sumar reservadas para ese evento excluyendo el ticket que está siendo actualizado (si corresponde)
     SELECT IFNULL(SUM(cantidad_personas),0) INTO v_actual
       FROM tickets
       WHERE id_evento = NEW.id_evento
@@ -150,17 +134,13 @@ BEGIN
         AND id_ticket <> OLD.id_ticket;
 
     IF (v_actual + IFNULL(NEW.cantidad_personas,0)) > v_capacidad THEN
-      SIGNAL SQLSTATE '45000'; SET MESSAGE_TEXT = CONCAT('Capacidad insuficiente en UPDATE: capacidad=', v_capacidad, ', ya reservadas excluyendo este ticket=', v_actual);
+      SIGNAL SQLSTATE '45000';
+      SET message = CONCAT('Capacidad insuficiente en UPDATE: capacidad=', v_capacidad, ', ya reservadas excluyendo este ticket=', v_actual);
     END IF;
   END IF;
-  -- Si NEW.estado no es 'activa' no hace falta chequeo.
 END$$
 DELIMITER ;
 
--- =========================
--- Procedimiento c) Top 10 obras más valoradas en un rango de fechas
--- Mostrar: nombre de la obra y puntaje (promedio) de la misma
--- =========================
 DELIMITER $$
 CREATE PROCEDURE sp_top10_obras_por_rango(
   IN p_fecha_inicio DATE,
@@ -180,10 +160,6 @@ BEGIN
 END$$
 DELIMITER ;
 
--- =========================
--- Procedimiento d) Promedio de las valoraciones histórico por tipo de membresía
--- Mostrar: tipo (Estandar/Premium/Exclusive) y promedio historico (todos los tiempos)
--- =========================
 DELIMITER $$
 CREATE PROCEDURE sp_promedio_valoraciones_por_membresia()
 BEGIN
@@ -198,18 +174,12 @@ BEGIN
 END$$
 DELIMITER ;
 
--- =========================
--- Evento e) Diario a la medianoche: invalidar tickets cuya fecha ya pasó y no fueron usados -> estado = 'vencido'
--- =========================
--- Asegurate de que el event_scheduler esté activo:
--- SET GLOBAL event_scheduler = ON;
 DELIMITER $$
 CREATE EVENT ev_invalida_tickets_vencidos_midnight
 ON SCHEDULE EVERY 1 DAY
-STARTS (TIMESTAMP(CURDATE()) + INTERVAL 1 DAY) -- comienza mañana a la medianoche
+STARTS (TIMESTAMP(CURDATE()) + INTERVAL 1 DAY)
 DO
 BEGIN
-  -- Marcar como vencido los tickets cuya fecha_reserva < CURRENT_DATE y que no fueron usados y que estén 'activa'
   UPDATE tickets
     SET estado = 'vencido'
     WHERE fecha_reserva < CURRENT_DATE()
@@ -218,19 +188,13 @@ BEGIN
 END$$
 DELIMITER ;
 
--- =========================
--- Evento f) Diario 06:00am: insertar recordatorios en notificaciones para reservas del día
--- =========================
 DELIMITER $$
 CREATE EVENT ev_insertar_recordatorios_6am
 ON SCHEDULE EVERY 1 DAY
-STARTS (TIMESTAMP(CURDATE()) + INTERVAL 1 DAY + INTERVAL 6 HOUR) -- comienza mañana a las 06:00am
+STARTS (TIMESTAMP(CURDATE()) + INTERVAL 1 DAY + INTERVAL 6 HOUR)
 DO
 BEGIN
   DECLARE v_message TEXT;
-
-  -- Insertar una notificación por usuario por reserva activa del día.
-  -- Evitar duplicados para el mismo usuario/evento en la misma fecha (básico con NOT EXISTS).
   INSERT INTO notificaciones (id_usuario, id_ticket, mensaje, fecha_creacion)
   SELECT t.id_usuario, t.id_ticket,
          CONCAT('Recordatorio: tenés una reserva para el evento ', IFNULL(e.nombre, CONCAT('ID#',t.id_evento)),
