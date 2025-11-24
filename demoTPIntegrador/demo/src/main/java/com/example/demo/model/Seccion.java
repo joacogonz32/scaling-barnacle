@@ -1,5 +1,6 @@
 package com.example.demo.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -21,6 +22,7 @@ public class Seccion {
 
     @ManyToOne
     @JoinColumn(name="id_piso")
+    @JsonBackReference
     private Piso piso;
 
     public Long getIdSeccion() {

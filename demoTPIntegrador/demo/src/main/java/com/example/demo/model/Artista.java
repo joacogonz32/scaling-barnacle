@@ -1,5 +1,6 @@
 package com.example.demo.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import java.util.List;
@@ -22,6 +23,7 @@ public class Artista {
     private String descripcion;
 
     @OneToMany(mappedBy = "artista")
+    @JsonManagedReference("artista-obras")
     private List<Obra> obras;
 
     public Long getIdArtista() {

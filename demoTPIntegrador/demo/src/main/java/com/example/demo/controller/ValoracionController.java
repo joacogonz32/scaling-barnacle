@@ -10,6 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/valoraciones")
+@CrossOrigin(origins = "*")
 public class ValoracionController {
 
     private final ValoracionesService valoracionesService;

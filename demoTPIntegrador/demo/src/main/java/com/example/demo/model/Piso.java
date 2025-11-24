@@ -1,5 +1,6 @@
 package com.example.demo.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import java.util.List;
@@ -21,9 +22,11 @@ public class Piso {
     private String descripcion;
 
     @OneToMany(mappedBy = "piso")
+    @JsonManagedReference
     private List<Sala> salas;
 
     @OneToMany(mappedBy = "piso")
+    @JsonManagedReference
     private List<Seccion> secciones;
 
     public Long getIdPiso() {

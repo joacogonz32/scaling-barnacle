@@ -1,5 +1,7 @@
 package com.example.demo.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import java.util.List;
@@ -14,7 +16,6 @@ public class Sala {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idSala;
-
     private String nombre;
 
     @Column(columnDefinition = "TEXT")
@@ -22,9 +23,11 @@ public class Sala {
 
     @ManyToOne
     @JoinColumn(name="id_piso")
+    @JsonBackReference
     private Piso piso;
 
     @OneToMany(mappedBy = "sala")
+    @JsonManagedReference("sala-obras")
     private List<Obra> obras;
 
     public Long getIdSala() {

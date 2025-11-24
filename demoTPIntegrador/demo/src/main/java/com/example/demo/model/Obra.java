@@ -1,5 +1,6 @@
 package com.example.demo.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 import java.util.List;
@@ -27,14 +28,17 @@ public class Obra {
 
     @ManyToOne
     @JoinColumn(name="id_artista")
+    @JsonBackReference("artista-obras")
     private Artista artista;
 
     @ManyToOne
     @JoinColumn(name="id_sala")
+    @JsonBackReference("sala-obras")
     private Sala sala;
 
     @ManyToOne
     @JoinColumn(name="id_tipo_obra")
+    @JsonBackReference("tipo-obras")
     private TipoObra tipoObra;
 
     public Long getIdObra() {

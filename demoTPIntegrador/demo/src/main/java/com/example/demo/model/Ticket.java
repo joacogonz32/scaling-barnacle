@@ -21,8 +21,12 @@ public class Ticket {
     private Usuario usuario;
 
     @ManyToOne
-    @JoinColumn(name="id_obra")
-    private Obra obra;
+    @JoinColumn(name="id_info")
+    private InformacionMuseo informacionMuseo;
+
+    @ManyToOne
+    @JoinColumn(name="id_evento", nullable = true)
+    private Evento evento;
 
     private LocalDate fechaReserva;
     private LocalTime horaReserva;
@@ -31,18 +35,19 @@ public class Ticket {
     @Enumerated(EnumType.STRING)
     private EstadoTicket estado;
 
-    public Ticket(Usuario ticketUsuario, Obra ticketObra) {
-    }
-    public Ticket(Long idTicket, Usuario usuario, Obra obra, LocalDate fechaReserva, LocalTime horaReserva, Integer cantidadPersonas, EstadoTicket estado) {
-        this.idTicket = idTicket;
+    public Ticket() {}
+
+    public Ticket(Usuario usuario, InformacionMuseo informacionMuseo, Evento evento,
+                  LocalDate fechaReserva, LocalTime horaReserva,
+                  Integer cantidadPersonas, EstadoTicket estado) {
         this.usuario = usuario;
-        this.obra = obra;
+        this.informacionMuseo = informacionMuseo;
+        this.evento = evento;
         this.fechaReserva = fechaReserva;
         this.horaReserva = horaReserva;
         this.cantidadPersonas = cantidadPersonas;
         this.estado = estado;
     }
-
 
     public Long getIdTicket() {
         return idTicket;
@@ -60,12 +65,20 @@ public class Ticket {
         this.usuario = usuario;
     }
 
-    public Obra getObra() {
-        return obra;
+    public InformacionMuseo getInformacionMuseo() {
+        return informacionMuseo;
     }
 
-    public void setObra(Obra obra) {
-        this.obra = obra;
+    public void setInformacionMuseo(InformacionMuseo informacionMuseo) {
+        this.informacionMuseo = informacionMuseo;
+    }
+
+    public Evento getEvento() {
+        return evento;
+    }
+
+    public void setEvento(Evento evento) {
+        this.evento = evento;
     }
 
     public LocalDate getFechaReserva() {

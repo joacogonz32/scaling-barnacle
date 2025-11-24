@@ -12,6 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/obras")
+@CrossOrigin(origins = "*")
 public class ObraController {
 
     private final ObraService obraService;
