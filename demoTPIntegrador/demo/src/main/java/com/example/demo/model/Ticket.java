@@ -1,11 +1,15 @@
 package com.example.demo.model;
 
 import jakarta.persistence.*;
+import lombok.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
 @Entity
-@Table(name = "tickets")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(name="tickets")
 public class Ticket {
 
     @Id
@@ -13,12 +17,12 @@ public class Ticket {
     private Long idTicket;
 
     @ManyToOne
-    @JoinColumn(name = "id_usuario", nullable = false)
+    @JoinColumn(name="id_usuario")
     private Usuario usuario;
 
     @ManyToOne
-    @JoinColumn(name = "id_info", nullable = false)
-    private InformacionMuseo informacionMuseo;
+    @JoinColumn(name="id_obra")
+    private Obra obra;
 
     private LocalDate fechaReserva;
     private LocalTime horaReserva;
@@ -27,24 +31,18 @@ public class Ticket {
     @Enumerated(EnumType.STRING)
     private EstadoTicket estado;
 
-    public Ticket() {}
-
-    public Ticket(Usuario usuario,
-                  InformacionMuseo informacionMuseo,
-                  LocalDate fechaReserva,
-                  LocalTime horaReserva,
-                  Integer cantidadPersonas) {
-
+    public Ticket(Usuario ticketUsuario, Obra ticketObra) {
+    }
+    public Ticket(Long idTicket, Usuario usuario, Obra obra, LocalDate fechaReserva, LocalTime horaReserva, Integer cantidadPersonas, EstadoTicket estado) {
+        this.idTicket = idTicket;
         this.usuario = usuario;
-        this.informacionMuseo = informacionMuseo;
+        this.obra = obra;
         this.fechaReserva = fechaReserva;
         this.horaReserva = horaReserva;
         this.cantidadPersonas = cantidadPersonas;
-        this.estado = EstadoTicket.ACTIVA;
+        this.estado = estado;
     }
 
-    public Ticket(Usuario usuario, InformacionMuseo info, LocalDate fechaReserva, LocalTime horaReserva, Integer cantidadPersonas, EstadoTicket estadoTicket) {
-    }
 
     public Long getIdTicket() {
         return idTicket;
@@ -62,12 +60,12 @@ public class Ticket {
         this.usuario = usuario;
     }
 
-    public InformacionMuseo getInformacionMuseo() {
-        return informacionMuseo;
+    public Obra getObra() {
+        return obra;
     }
 
-    public void setInformacionMuseo(InformacionMuseo informacionMuseo) {
-        this.informacionMuseo = informacionMuseo;
+    public void setObra(Obra obra) {
+        this.obra = obra;
     }
 
     public LocalDate getFechaReserva() {

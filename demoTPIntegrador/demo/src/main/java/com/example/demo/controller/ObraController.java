@@ -28,9 +28,11 @@ public class ObraController {
             @RequestParam(required = false) String ubicacion,
             @RequestParam(required = false) String epoca,
             @RequestParam(required = false) String nombre,
-            @RequestParam(required = false, defaultValue = "-1.0") Float popularidad
+            @RequestParam(required = false) Float popularidad
     ) {
         List<Obra> obras = obraService.filtrar(ubicacion, epoca, nombre, popularidad);
+
+        System.out.printf(obras.get(0).getNombre());
         return ResponseEntity.ok(obras);
     }
 

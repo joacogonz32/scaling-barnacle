@@ -10,6 +10,6 @@ import java.util.List;
 @Repository
 public interface EstadisticaRepository extends JpaRepository<Estadistica, Long> {
 
-    @Query(value = "CALL sp_top_obras(:desde, :hasta)", nativeQuery = true)
+    @Query(value = "CALL sp_top10_obras_por_rango(:desde, :hasta)", nativeQuery = true)
     List<Object[]> obtenerTopObras(@Param("desde") String desde, @Param("hasta") String hasta);
 }

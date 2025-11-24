@@ -1,7 +1,5 @@
 package com.example.demo.service;
 
-import com.example.demo.dto.ObraDTO;
-import com.example.demo.dto.ArtistaDTO;
 import com.example.demo.model.Obra;
 import com.example.demo.model.Valoracion;
 import com.example.demo.repository.ObraRepository;
@@ -28,11 +26,17 @@ public class ObraService {
         return obraRepository.findById(id).orElse(null);
     }
 
-    public List<Obra> filtrar(String ubicacion, String epoca, String nombre, float popularidad) {
-        return obraRepository.filtrarObras(ubicacion, epoca, nombre, popularidad);
+    // Filtrado combinable por ubicación, época, nombre y popularidad
+    public List<Obra> filtrar(String ubicacion, String epoca, String nombre, Float popularidad) {
+        return obraRepository.filtrarObras(
+                ubicacion != null && !ubicacion.isEmpty() ? ubicacion : null,
+                epoca != null && !epoca.isEmpty() ? epoca : null,
+                nombre != null && !nombre.isEmpty() ? nombre : null,
+                popularidad
+        );
     }
 
-
+    // Top 10 obras por rango de fechas según valoraciones
     public List<Obra> obtenerTop10PorFechas(LocalDate desde, LocalDate hasta) {
 
         List<Valoracion> valoraciones = valoracionRepository.findByFechaBetween(desde, hasta);

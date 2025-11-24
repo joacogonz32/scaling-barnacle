@@ -12,6 +12,7 @@ public interface ObraRepository extends JpaRepository<Obra, Long> {
 
     List<Obra> findByEpocaContainingAndNombreContaining(String epoca, String nombre);
 
+    // Consulta personalizada para filtrar obras por ubicación (nombre de sala), época, nombre y popularidad
     @Query("SELECT o FROM Obra o WHERE " +
             "(:ubicacion IS NULL OR lower(o.sala.nombre) LIKE lower(concat('%', :ubicacion, '%'))) AND " +
             "(:epoca IS NULL OR lower(o.epoca) LIKE lower(concat('%', :epoca, '%'))) AND " +
@@ -21,6 +22,6 @@ public interface ObraRepository extends JpaRepository<Obra, Long> {
             @Param("ubicacion") String ubicacion,
             @Param("epoca") String epoca,
             @Param("nombre") String nombre,
-            @Param("popularidad") float popularidad
+            @Param("popularidad") Float popularidad
     );
 }
