@@ -38,6 +38,9 @@ public class Valoracion {
         this.comentario = comentario;
         this.fecha = fechaValoracion;
     }
+
+    public Valoracion() {}
+
     public Long getIdValoracion() {
         return idValoracion;
     }

@@ -2,11 +2,10 @@ package com.example.demo.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import lombok.*;
-import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
 @Entity
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name="obras")
@@ -26,6 +25,11 @@ public class Obra {
     @Column(name="nivel_popularidad")
     private Float nivelPopularidad;
 
+    // *** CAMPO DE IMAGEN (USANDO EL NOMBRE DE COLUMNA QUE ME DISTE) ***
+    @Column(name="imagen_url")
+    private String imagenUrl;
+
+    // --- RELACIONES DE VUELTA ---
     @ManyToOne
     @JoinColumn(name="id_artista")
     @JsonBackReference("artista-obras")
@@ -41,69 +45,34 @@ public class Obra {
     @JsonBackReference("tipo-obras")
     private TipoObra tipoObra;
 
-    public Long getIdObra() {
-        return idObra;
-    }
+    // --- GETTERS Y SETTERS MANUALES (Garantizan el funcionamiento de Hibernate/Jackson) ---
 
-    public void setIdObra(Long idObra) {
-        this.idObra = idObra;
-    }
+    public Long getIdObra() { return idObra; }
+    public void setIdObra(Long idObra) { this.idObra = idObra; }
 
-    public String getNombre() {
-        return nombre;
-    }
+    public String getNombre() { return nombre; }
+    public void setNombre(String nombre) { this.nombre = nombre; }
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
+    public String getDescripcion() { return descripcion; }
+    public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
 
-    public String getDescripcion() {
-        return descripcion;
-    }
+    public String getEpoca() { return epoca; }
+    public void setEpoca(String epoca) { this.epoca = epoca; }
 
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
-    }
+    public Float getNivelPopularidad() { return nivelPopularidad; }
+    public void setNivelPopularidad(Float nivelPopularidad) { this.nivelPopularidad = nivelPopularidad; }
 
-    public String getEpoca() {
-        return epoca;
-    }
+    public Artista getArtista() { return artista; }
+    public void setArtista(Artista artista) { this.artista = artista; }
 
-    public void setEpoca(String epoca) {
-        this.epoca = epoca;
-    }
+    public Sala getSala() { return sala; }
+    public void setSala(Sala sala) { this.sala = sala; }
 
-    public Float getNivelPopularidad() {
-        return nivelPopularidad;
-    }
+    public TipoObra getTipoObra() { return tipoObra; }
+    public void setTipoObra(TipoObra tipoObra) { this.tipoObra = tipoObra; }
 
-    public void setNivelPopularidad(Float nivelPopularidad) {
-        this.nivelPopularidad = nivelPopularidad;
-    }
-
-    public Artista getArtista() {
-        return artista;
-    }
-
-    public void setArtista(Artista artista) {
-        this.artista = artista;
-    }
-
-    public Sala getSala() {
-        return sala;
-    }
-
-    public void setSala(Sala sala) {
-        this.sala = sala;
-    }
-
-    public TipoObra getTipoObra() {
-        return tipoObra;
-    }
-
-    public void setTipoObra(TipoObra tipoObra) {
-        this.tipoObra = tipoObra;
-    }
+    public String getImagenUrl() { return imagenUrl; }
+    public void setImagenUrl(String imagenUrl) { this.imagenUrl = imagenUrl; }
 
     @Override
     public String toString() {
@@ -113,7 +82,6 @@ public class Obra {
                 ", descripcion='" + descripcion + '\'' +
                 ", epoca='" + epoca + '\'' +
                 ", nivelPopularidad=" + nivelPopularidad +
-
                 ", tipoObra=" + tipoObra +
                 '}';
     }
