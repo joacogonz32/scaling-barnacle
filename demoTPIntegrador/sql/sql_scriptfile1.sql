@@ -1,34 +1,7 @@
-USE `polimet_db`;
-DROP TRIGGER IF EXISTS tr_valoraciones_after_insert;
-DROP TRIGGER IF EXISTS tr_valoraciones_after_update;
-DROP TRIGGER IF EXISTS tr_valoraciones_after_delete;
 
-DROP TRIGGER IF EXISTS tr_tickets_before_insert;
-DROP TRIGGER IF EXISTS tr_tickets_before_update;
+-- A. TRIGGERS: ACTUALIZAR POPULARIDAD 
 
-DROP PROCEDURE IF EXISTS sp_top10_obras_por_rango;
-DROP PROCEDURE IF EXISTS sp_promedio_valoraciones_por_membresia;
-
-DROP FUNCTION IF EXISTS fn_total_personas_reservadas_evento;
-
-DROP EVENT IF EXISTS ev_invalida_tickets_vencidos_midnight;
-DROP EVENT IF EXISTS ev_insertar_recordatorios_6am;
-
-DELIMITER $$
-CREATE FUNCTION fn_total_personas_reservadas_evento(p_id_evento INT) RETURNS INT
-DETERMINISTIC
-BEGIN
-  DECLARE v_total INT DEFAULT 0;
-  SELECT IFNULL(SUM(cantidad_personas),0)
-    INTO v_total
-    FROM tickets
-    WHERE id_evento = p_id_evento
-      AND estado = 'activa';
-  RETURN v_total;
-END$$
-DELIMITER ;
-
-DELIMITER $$
+DROP TRIGGER IF EXISTS tr_valoraciones_after_insert$$
 CREATE TRIGGER tr_valoraciones_after_insert
 AFTER INSERT ON valoraciones
 FOR EACH ROW
@@ -42,6 +15,7 @@ BEGIN
   WHERE id_obra = NEW.id_obra;
 END$$
 
+DROP TRIGGER IF EXISTS tr_valoraciones_after_update$$
 CREATE TRIGGER tr_valoraciones_after_update
 AFTER UPDATE ON valoraciones
 FOR EACH ROW
@@ -55,6 +29,7 @@ BEGIN
       )
     WHERE id_obra = OLD.id_obra;
   END IF;
+  
   IF NEW.id_obra IS NOT NULL THEN
     UPDATE obras
       SET nivel_popularidad = (
@@ -66,6 +41,7 @@ BEGIN
   END IF;
 END$$
 
+DROP TRIGGER IF EXISTS tr_valoraciones_after_delete$$
 CREATE TRIGGER tr_valoraciones_after_delete
 AFTER DELETE ON valoraciones
 FOR EACH ROW
@@ -78,70 +54,43 @@ BEGIN
     )
   WHERE id_obra = OLD.id_obra;
 END$$
-DELIMITER ;
 
-DELIMITER $$
+
+-- B. TRIGGER: DISPONIBILIDAD 
+
+DROP TRIGGER IF EXISTS tr_tickets_before_insert$$
 CREATE TRIGGER tr_tickets_before_insert
 BEFORE INSERT ON tickets
 FOR EACH ROW
 BEGIN
   DECLARE v_capacidad INT DEFAULT 0;
   DECLARE v_actual INT DEFAULT 0;
-  declare message text;
-  IF NEW.id_evento IS NULL THEN
-    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'No se especificó id_evento en la reserva.';
-  END IF;
+  DECLARE v_msg VARCHAR(255);
 
-  SELECT capacidad INTO v_capacidad FROM eventos WHERE id_evento = NEW.id_evento;
+  SELECT capacidad INTO v_capacidad 
+  FROM informacion_museo 
+  WHERE id_info = NEW.id_info;
+
   IF v_capacidad IS NULL THEN
-    SIGNAL SQLSTATE '45000';
-    SET message = 'Evento no encontrado o sin capacidad definida.';
+     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error: Información del museo no encontrada.';
   END IF;
   
   SELECT IFNULL(SUM(cantidad_personas),0) INTO v_actual
     FROM tickets
-    WHERE id_evento = NEW.id_evento
+    WHERE id_info = NEW.id_info
+      AND fecha_reserva = NEW.fecha_reserva
+      AND hora_reserva = NEW.hora_reserva
       AND estado = 'activa';
 
-  IF (v_actual + IFNULL(NEW.cantidad_personas,0)) > v_capacidad THEN
-    SIGNAL SQLSTATE '45000';
-		SET message = CONCAT('Capacidad insuficiente: capacidad=', v_capacidad, ', ya reservadas=', v_actual);
+  IF (v_actual + NEW.cantidad_personas) > v_capacidad THEN
+    SET v_msg = CONCAT('Capacidad insuficiente. Total: ', v_capacidad, '. Ocupado: ', v_actual);
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = v_msg;
   END IF;
 END$$
-DELIMITER ;
 
--- BEFORE UPDATE
-DELIMITER $$
-CREATE TRIGGER tr_tickets_before_update
-BEFORE UPDATE ON tickets
-FOR EACH ROW
-BEGIN
-  DECLARE v_capacidad INT DEFAULT 0;
-  DECLARE v_actual INT DEFAULT 0;
-  DECLARE v_excl_old INT DEFAULT 0;
-  declare message text;
+-- C. PROCEDIMIENTO: TOP 10 OBRAS
 
-  IF NEW.estado = 'activa' THEN
-    SELECT capacidad INTO v_capacidad FROM eventos WHERE id_evento = NEW.id_evento;
-    IF v_capacidad IS NULL THEN
-      SIGNAL SQLSTATE '45000'; SET message = 'Evento no encontrado o sin capacidad definida (UPDATE).';
-    END IF;
-
-    SELECT IFNULL(SUM(cantidad_personas),0) INTO v_actual
-      FROM tickets
-      WHERE id_evento = NEW.id_evento
-        AND estado = 'activa'
-        AND id_ticket <> OLD.id_ticket;
-
-    IF (v_actual + IFNULL(NEW.cantidad_personas,0)) > v_capacidad THEN
-      SIGNAL SQLSTATE '45000';
-      SET message = CONCAT('Capacidad insuficiente en UPDATE: capacidad=', v_capacidad, ', ya reservadas excluyendo este ticket=', v_actual);
-    END IF;
-  END IF;
-END$$
-DELIMITER ;
-
-DELIMITER $$
+DROP PROCEDURE IF EXISTS sp_top10_obras_por_rango$$
 CREATE PROCEDURE sp_top10_obras_por_rango(
   IN p_fecha_inicio DATE,
   IN p_fecha_fin DATE
@@ -158,9 +107,10 @@ BEGIN
   ORDER BY puntaje_promedio DESC
   LIMIT 10;
 END$$
-DELIMITER ;
 
-DELIMITER $$
+-- D. PROCEDIMIENTO: PROMEDIO POR MEMBRESIA
+
+DROP PROCEDURE IF EXISTS sp_promedio_valoraciones_por_membresia$$
 CREATE PROCEDURE sp_promedio_valoraciones_por_membresia()
 BEGIN
   SELECT m.tipo AS tipo_membresia,
@@ -172,44 +122,48 @@ BEGIN
   GROUP BY m.tipo
   ORDER BY promedio_puntaje DESC;
 END$$
-DELIMITER ;
 
-DELIMITER $$
+-- E. EVENTO: INVALIDAR TICKETS
+
+SET GLOBAL event_scheduler = ON$$
+
+DROP EVENT IF EXISTS ev_invalida_tickets_vencidos_midnight$$
 CREATE EVENT ev_invalida_tickets_vencidos_midnight
 ON SCHEDULE EVERY 1 DAY
-STARTS (TIMESTAMP(CURDATE()) + INTERVAL 1 DAY)
+STARTS (CURRENT_DATE + INTERVAL 1 DAY) 
 DO
 BEGIN
+ 
   UPDATE tickets
-    SET estado = 'vencido'
+    SET estado = 'cancelada'
     WHERE fecha_reserva < CURRENT_DATE()
-      AND usado = 0
       AND estado = 'activa';
 END$$
-DELIMITER ;
 
-DELIMITER $$
+-- F. EVENTO: RECORDATORIOS 
+
+DROP EVENT IF EXISTS ev_insertar_recordatorios_6am$$
 CREATE EVENT ev_insertar_recordatorios_6am
 ON SCHEDULE EVERY 1 DAY
-STARTS (TIMESTAMP(CURDATE()) + INTERVAL 1 DAY + INTERVAL 6 HOUR)
+STARTS (CURRENT_DATE + INTERVAL 1 DAY + INTERVAL 6 HOUR) 
 DO
 BEGIN
-  DECLARE v_message TEXT;
-  INSERT INTO notificaciones (id_usuario, id_ticket, mensaje, fecha_creacion)
-  SELECT t.id_usuario, t.id_ticket,
-         CONCAT('Recordatorio: tenés una reserva para el evento ', IFNULL(e.nombre, CONCAT('ID#',t.id_evento)),
-                ' para hoy (', DATE_FORMAT(t.fecha_reserva, '%Y-%m-%d'), ') a las ', IFNULL( t.hora_reserva, '' ) ),
+  INSERT INTO notificaciones (id_usuario, mensaje, fecha_creacion)
+  SELECT 
+         t.id_usuario,
+         CONCAT('Recordatorio: Tenés una reserva hoy (', DATE_FORMAT(t.fecha_reserva, '%Y-%m-%d'), 
+                ') a las ', DATE_FORMAT(t.hora_reserva, '%H:%i'), 
+                '. Cantidad personas: ', t.cantidad_personas),
          NOW()
   FROM tickets t
-  LEFT JOIN eventos e ON e.id_evento = t.id_evento
   WHERE t.fecha_reserva = CURRENT_DATE()
     AND t.estado = 'activa'
-    AND t.usado = 0
     AND NOT EXISTS (
       SELECT 1 FROM notificaciones n
       WHERE n.id_usuario = t.id_usuario
-        AND n.id_ticket = t.id_ticket
         AND DATE(n.fecha_creacion) = CURRENT_DATE()
+        AND n.mensaje LIKE 'Recordatorio: Tenés una reserva hoy%'
     );
 END$$
+
 DELIMITER ;
