@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PoliMet - Museo</title>
-    <!-- Fuentes y Iconos -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
@@ -28,24 +27,23 @@
         </div>
     </header>
 
-    <!-- IMPORTANTE: Pega el link de la foto de la Mona Lisa dentro de las comillas de url('') -->
-    <section class="hero-home" style="background-image: url('');">
-        <div class="hero-overlay"></div> <!-- Filtro oscuro -->
-        
-        <div class="hero-content">
+    <section class="hero-home" id="hero-home" style="background-image: url('');">
+        <div class="hero-overlay"></div> <div class="hero-content">
             <h1>Museo Polimet</h1>
-            <p>En nuestro museo buscamos combinar el arte clásico con lo moderno.</p>
+            <p id="museum-description">Cargando descripción...</p>
         </div>
 
-        <!-- Caja flotante derecha -->
         <div class="hero-card-float">
             <h3>Bienvenidos al Museo PoliMet</h3>
-            <div class="horarios">
-                De miercoles a domingo<br>
-                Horarios de 09:00 a 21:30
+            <div id="museum-hours" class="horarios">
+                Cargando horarios...
             </div>
-            <a href="entradas.html" class="btn-hero"><i class="fa-solid fa-ticket"></i> Reserva tu entrada</a>
-            <a href="visitas.html" class="btn-hero"><i class="fa-solid fa-circle-info"></i> Organiza tu visita</a>
+
+            <div id="featured-event">
+                </div>
+
+            <a href="signup.html" class="btn-hero"><i class="fa-solid fa-ticket"></i> Reserva tu entrada</a>
+            <a href="#" class="btn-hero"><i class="fa-solid fa-circle-info"></i> Organiza tu visita</a>
         </div>
     </section>
 
@@ -53,7 +51,6 @@
         <h2>Lo mas destacado</h2>
     </div>
 
-    <!-- SECCION OSCURA (EXPERIENCIA) -->
     <section class="dark-section">
         <div class="container">
             <p class="dark-lead">
@@ -61,19 +58,16 @@
             </p>
 
             <div class="gallery-grid">
-                <!-- Foto 1 -->
                 <div class="gallery-item">
-                    <img src="<!-- PEGAR AQUI LINK FOTO VISITAS GUIADAS -->" alt="Visitas">
+                    <img src="https://i.imgur.com/2Xy5s6Q.jpg" alt="Visitas">
                     <div class="gallery-label">Visitas Guiadas</div>
                 </div>
-                <!-- Foto 2 -->
                 <div class="gallery-item">
-                    <img src="<!-- PEGAR AQUI LINK FOTO EVENTOS -->" alt="Eventos">
+                    <img src="https://i.imgur.com/1Zp7Qc9.jpg" alt="Eventos">
                     <div class="gallery-label">Eventos</div>
                 </div>
-                <!-- Foto 3 -->
                 <div class="gallery-item">
-                    <img src="<!-- PEGAR AQUI LINK FOTO OBRAS -->" alt="Obras">
+                    <img src="https://i.imgur.com/Yh859mS.jpg" alt="Obras">
                     <div class="gallery-label">Obras</div>
                 </div>
             </div>
@@ -85,11 +79,11 @@
         <p>El museo guarda secretos en cada rincón ¿Que hay detras de esa sala cerrada? Nuestras membresias son la llave maestra.</p>
 
         <div class="stamps-row">
-            <img src="<!-- PEGAR LINK PNG SELLO ESTANDAR -->" class="stamp-img" alt="Estandar">
-            <img src="<!-- PEGAR LINK PNG SELLO PREMIUM -->" class="stamp-img" alt="Premium">
-            <img src="<!-- PEGAR LINK PNG SELLO GOLD -->" class="stamp-img" alt="Gold">
+            <img src="https://i.imgur.com/vH9Yk1S.png" class="stamp-img" alt="Estandar">
+            <img src="https://i.imgur.com/T0b4VqA.png" class="stamp-img" alt="Premium">
+            <img src="https://i.imgur.com/9C0xV6X.png" class="stamp-img" alt="Gold">
         </div>
-        
+
         <button class="btn-dark" onclick="window.location.href='membresias.html'">MEMBRESIAS <span style="font-size: 0.7rem; display:block; font-weight:400; margin-top:5px; text-transform:none;">Ver membresias</span></button>
     </section>
 
@@ -103,7 +97,7 @@
         </div>
 
         <div class="review-card">
-            <img src="<!-- PEGAR LINK FOTO MODIGLIANI (MUJER) -->" alt="Reseña">
+            <img src="https://i.imgur.com/0P6sV0Z.jpg" alt="Reseña">
             <div class="stars">★★★★★</div>
             <h3>Figura de mujer</h3>
             <p style="font-size: 0.85rem; color: #666; margin-top: 5px;">Ayer por fin pude ver la "Figura de mujer"... ¡wow! Es simplemente espectacular.</p>
@@ -131,39 +125,46 @@
             © 2025 PoliMet. Todos los derechos reservados
         </div>
     </footer>
+
     <script>
-        const BASE_URL = 'http://localhost:8080';
+        const API_BASE_URL = 'http://localhost:8080/api';
 
-        async function cargarContenidoHome() {
+        async function fetchHomeData() {
             try {
-                const response = await fetch(`${BASE_URL}/api/home`);
-
-                if (!response.ok) {
-                    throw new Error(`Error HTTP: ${response.status}`);
-                }
+                const response = await fetch(`${API_BASE_URL}/home`);
+                if (!response.ok) throw new Error('Network response was not ok: ' + response.statusText);
 
                 const data = await response.json();
                 
-                const horariosDiv = document.querySelector('.hero-card-float .horarios');
-                if (horariosDiv && data.horarios) {
-                    horariosDiv.innerHTML = data.horarios.replace(/\n/g, '<br>');
-                }
-                
-                if (data.fotos) {
-                    const heroSection = document.querySelector('.hero-home');
-                    heroSection.style.backgroundImage = `url('${data.fotos}')`;
+                document.getElementById('hero-home').style.backgroundImage = `url('${data.fotos}')`;
+                document.getElementById('museum-description').textContent = data.descripcion;
+
+                const hoursHtml = data.horarios.replace(/\n/g, '<br>');
+                document.getElementById('museum-hours').innerHTML = hoursHtml;
+
+                const featuredEventContainer = document.getElementById('featured-event');
+                if (data.eventoDestacado) {
+                    const event = data.eventoDestacado;
+                    featuredEventContainer.innerHTML = `
+                        <a href="#" class="btn-hero" style="background-color: #D4AF37; color: #121212;">
+                            <i class="fa-solid fa-star"></i> 
+                            ${event.nombre}
+                        </a>
+                        <p style="font-size: 0.9rem; color: #ccc; margin-top: -10px; margin-bottom: 10px;">${event.descripcion}</p>
+                    `;
+                } else {
+                    featuredEventContainer.style.display = 'none';
                 }
 
             } catch (error) {
-                console.error("Error al cargar la información del museo:", error);
-                
+                console.error("Error al cargar datos de la Home:", error);
             }
         }
-        
+
         document.addEventListener("DOMContentLoaded", function() {
-            
-            cargarContenidoHome();
-            
+            // 1. Carga de datos de la API
+            fetchHomeData();
+
             const usuarioRegistrado = localStorage.getItem('usuarioRegistrado') === 'true';
             const userIcon = document.querySelector('.user-icon');
             const headerContainer = document.querySelector('.header-inner');
@@ -171,6 +172,7 @@
             if (userIcon && usuarioRegistrado) {
                 userIcon.classList.add('logged-in');
                 userIcon.setAttribute('href', '#');
+                userIcon.setAttribute('title', 'Sesión iniciada: ' + (localStorage.getItem('nombreUsuario') || 'Usuario'));
 
                 const dropdownHTML = `
                     <div class="dropdown-menu" id="userDropdown">
@@ -202,10 +204,12 @@
                     e.preventDefault();
                     localStorage.removeItem('usuarioRegistrado');
                     localStorage.removeItem('idUsuario');
+                    localStorage.removeItem('nombreUsuario');
                     window.location.reload();
                 });
             }
         });
     </script>
 </body>
+
 </html>

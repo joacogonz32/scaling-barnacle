@@ -83,8 +83,9 @@
                 <button type="submit" class="btn-create">CREAR CUENTA</button>
                 
                 <div class="login-link">
-                    Ya tienes cuenta? <a href="#">Iniciar sesion</a>
+                    Ya tienes cuenta? <a href="login.html">Iniciar sesion</a>
                 </div>
+            
             </form>
         </div>
     </section>
@@ -283,6 +284,13 @@
 
                 registrarUsuario(usuario);
             }
+            btnLogout.addEventListener('click', function(e) {
+                e.preventDefault();
+                localStorage.removeItem('usuarioRegistrado');
+                localStorage.removeItem('idUsuario');
+                localStorage.removeItem('nombreUsuario'); 
+                window.location.reload();
+            });
         });
     </script>
 </body>

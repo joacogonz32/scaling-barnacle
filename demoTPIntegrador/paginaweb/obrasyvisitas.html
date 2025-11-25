@@ -27,12 +27,11 @@
         </div>
     </header>
 
-    <section class="hero-obras" style="background-image: url('<!-- PEGAR LINK FOTO MONA LISA GRANDE FONDO -->');">
+    <section class="hero-obras" style="background-image: url('https://i.imgur.com/R38C8uJ.jpg');">
         <div class="hero-overlay"></div>
         <h1>La Colección PoliMet: Obras que Definen Nuestro Siglo</h1>
     </section>
 
-    <!-- MODALIDAD -->
     <div class="container modalidad-grid">
         <div class="modalidad-text">
             <h2>MODALIDAD</h2>
@@ -40,66 +39,29 @@
         </div>
         
         <div class="modalidad-card">
-            <img src="<!-- PEGAR LINK FOTO OBRAS (LA CHICA DEL ARETE) -->" alt="Obras">
+            <img src="https://i.imgur.com/G4Yt0Lg.jpg" alt="Obras">
             <div class="modalidad-label">OBRAS</div>
         </div>
         
         <div class="modalidad-card">
-            <img src="<!-- PEGAR LINK FOTO VISITAS (PALACIO) -->" alt="Visitas">
+            <img src="https://i.imgur.com/1Zp7Qc9.jpg" alt="Visitas">
             <div class="modalidad-label">VISITAS GUIADAS</div>
         </div>
     </div>
 
-    <!-- POPULARES -->
     <div class="container popular-list">
         <div class="popular-header">
-            <h2>MAS POPULARES</h2>
+            <h2>NUESTRA COLECCIÓN (MAS POPULARES)</h2>
             <div class="divider-line"></div>
         </div>
 
-        <!-- Item 1 -->
-        <div class="popular-item">
-            <img src="<!-- PEGAR LINK FOTO RENOIR (ALMUERZO) -->" alt="Renoir">
-            <div class="popular-info">
-                <h3>El almuerzo de los remeros</h3>
-                <span class="author">Autor: Pierre-Auguste Renoir</span>
-                <p>Esta obra maestra del Impresionismo es un vibrante retrato de la vida social burguesa a orillas del río Sena, destacando la amistad, la moda y el placer efímero de la época.</p>
-            </div>
+        <div id="obras-container">
+            <p>Cargando obras...</p>
         </div>
 
-        <!-- Item 2 -->
-        <div class="popular-item">
-            <img src="<!-- PEGAR LINK FOTO NOCHE ESTRELLADA VAN GOGH -->" alt="Van Gogh">
-            <div class="popular-info">
-                <h3>La noche estrellada</h3>
-                <span class="author">Autor: Vincent van Gogh</span>
-                <p>Una de las obras más reconocidas del arte occidental. Muestra la vista exterior nocturna desde la ventana de la habitación del sanatorio de Saint-Rémy-de-Provence.</p>
-            </div>
-        </div>
-
-        <!-- Item 3 -->
-        <div class="popular-item">
-            <img src="<!-- PEGAR LINK FOTO MUJER SENTADA (MODIGLIANI U OTRA) -->" alt="Obra">
-            <div class="popular-info">
-                <h3>Mujer sentada</h3>
-                <span class="author">Autor: Amedeo Modigliani</span>
-                <p>Retrato característico con formas alargadas y ojos almendrados vacíos, que evocan una profunda melancolía y elegancia atemporal.</p>
-                <br>
-            </div>
-        </div>
-
-        <!-- Item 4 -->
-        <div class="popular-item">
-            <img src="<!-- PEGAR LINK FOTO CABALLERO MANO EN PECHO -->" alt="El Greco">
-            <div class="popular-info">
-                <h3>El caballero de la mano en el pecho</h3>
-                <span class="author">Autor: El Greco</span>
-                <p>Una de las obras más famosas del artista, representando un noble español con un gesto solemne de juramento.</p>
-            </div>
-        </div>
         <div style="text-align: center; margin-top: 80px; padding-bottom: 20px;">
-                <button class="btn-dark" style="padding: 15px 40px; font-size: 0.9rem;">EXPLORAR MAS</button>
-            </div>
+            <button class="btn-dark" style="padding: 15px 40px; font-size: 0.9rem;">EXPLORAR MAS</button>
+        </div>
     </div>
 
     <footer>
@@ -108,12 +70,10 @@
                 <h4 style="margin-bottom:20px;">Contacto</h4>
                 <p style="color:#aaa; font-size:0.9rem;">polimetadmin@example.com</p>
                 <p style="color:#aaa; font-size:0.9rem;">+5491178229110</p>
-                <p style="color:#aaa; font-size:0.9rem;">Santo Tome 3215 6B</p>
             </div>
             <div style="flex:1">
                 <h4 style="margin-bottom:20px;">Nosotros</h4>
                 <p><a href="#" style="color:#aaa; font-size:0.9rem;">Acerca de</a></p>
-                <p><a href="#" style="color:#aaa; font-size:0.9rem;">Terminos y condiciones</a></p>
             </div>
             <div style="flex:1; text-align:right; font-family: 'Playfair Display'; font-size: 1.5rem;">
                 <i class="fa-solid fa-landmark"></i> PoliMet
@@ -123,72 +83,51 @@
             © 2025 PoliMet. Todos los derechos reservados
         </div>
     </footer>
+
     <script>
-        const BASE_URL = 'http://localhost:8080';
-        async function filtrarObras(filtros) {
-            const params = new URLSearchParams();
-            if (filtros.ubicacion) params.append('ubicacion', filtros.ubicacion);
-            if (filtros.epoca) params.append('epoca', filtros.epoca);
-            if (filtros.nombre) params.append('nombre', filtros.nombre);
-            if (filtros.popularidad) params.append('popularidad', filtros.popularidad);
-            
-            const url = `${BASE_URL}/api/obras?${params.toString()}`;
+        const API_BASE_URL = 'http://localhost:8080/api';
 
-            try {
-                const response = await fetch(url);
-                if (!response.ok) {
-                    throw new Error(`Error HTTP: ${response.status}`);
-                }
+        async function fetchObras() {
+    const container = document.getElementById('obras-container');
+    container.innerHTML = '<p>Cargando obras...</p>';
 
-                const obras = await response.json();
-                console.log("Obras filtradas recibidas:", obras);
-                
-                return obras;
-            } catch (error) {
-                console.error("Error al obtener las obras:", error);
-                return [];
-            }
-        }
+    try {
+        const response = await fetch(`${API_BASE_URL}/obras`); 
+        if (!response.ok) throw new Error('Error al cargar obras: ' + response.statusText);
 
-        async function votarObra(idObra, puntaje, comentario) {
-            const idUsuario = localStorage.getItem('idUsuario'); 
-            
-            if (!idUsuario) {
-                alert("Debes iniciar sesión para poder votar una obra.");
-                return;
-            }
+        const obras = await response.json();
+        
+        const obrasToShow = obras.slice(0, 3); 
 
-            const votoRequest = {
-                idUsuario: Number(idUsuario), 
-                puntaje: puntaje, 
-                comentario: comentario
-            };
+        let htmlContent = '';
+        obrasToShow.forEach(obra => { 
+            const artistaNombre = obra.artista ? obra.artista.nombre : 'Autor Desconocido';
+            const imageUrl = obra.imagenUrl || 'https://via.placeholder.com/320x400?text=IMAGEN+NO+DISPONIBLE'; 
 
-            try {
-                const response = await fetch(`${BASE_URL}/api/obras/${idObra}/votar`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(votoRequest),
-                });
+            htmlContent += `
+                <div class="popular-item">
+                    <img src="${imageUrl}" alt="${obra.nombre}">
+                    <div class="popular-info">
+                        <h3>${obra.nombre}</h3>
+                        <span class="author">Autor: ${artistaNombre}</span>
+                        <p>${obra.descripcion}</p>
+                        <span class="author">Popularidad: ${obra.nivelPopularidad.toFixed(1)} / 5</span>
+                    </div>
+                </div>
+            `;
+        });
 
-                if (!response.ok) {
-                    const errorMessage = response.headers.get("Error") || "Error desconocido al votar.";
-                    throw new Error(errorMessage);
-                }
-
-                const valoracionGuardada = await response.json();
-                alert(`¡Voto exitoso! Obra #${idObra} calificada con ${valoracionGuardada.puntaje}. (Se actualizó la popularidad)`);
-
-            } catch (error) {
-                console.error("Error al votar la obra:", error.message);
-                alert("No se pudo registrar el voto: " + error.message);
-            }
-        }
+        container.innerHTML = htmlContent;
+    } catch (error) {
+        console.error("Error en fetchObras:", error);
+        container.innerHTML = `<p style="color: red;">Error al conectar con la API: ${error.message}</p>`;
+    }
+}
 
         document.addEventListener("DOMContentLoaded", function() {
-
+            fetchObras();
+            // ... (El resto de la lógica de sesión/logout/dropdown) ...
+            
             const usuarioRegistrado = localStorage.getItem('usuarioRegistrado') === 'true';
             const userIcon = document.querySelector('.user-icon');
             const headerContainer = document.querySelector('.header-inner');
@@ -196,6 +135,7 @@
             if (userIcon && usuarioRegistrado) {
                 userIcon.classList.add('logged-in');
                 userIcon.setAttribute('href', '#');
+                userIcon.setAttribute('title', 'Sesión iniciada: ' + (localStorage.getItem('nombreUsuario') || 'Usuario'));
 
                 const dropdownHTML = `
                     <div class="dropdown-menu" id="userDropdown">
@@ -204,8 +144,8 @@
                             <li><a href="#"><i class="fa-solid fa-gear"></i> Configuración</a></li>
                             <li><a href="membresias.html"><i class="fa-solid fa-crown"></i> Membresías</a></li>
                             <li><a href="#" id="btnLogout" class="logout-btn"><i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a></li>
-                    </ul>
-                </div>
+                        </ul>
+                    </div>
                 `;
                 headerContainer.insertAdjacentHTML('beforeend', dropdownHTML);
 
@@ -227,11 +167,11 @@
                     e.preventDefault();
                     localStorage.removeItem('usuarioRegistrado');
                     localStorage.removeItem('idUsuario');
+                    localStorage.removeItem('nombreUsuario');
                     window.location.reload();
                 });
             }
         });
-
     </script>
 </body>
 </html>
