@@ -175,17 +175,21 @@ END$$
 DELIMITER ;
 
 DELIMITER $$
+DELIMITER $$
+
+
+	-- correccion ejercicio e) 
 CREATE EVENT ev_invalida_tickets_vencidos_midnight
 ON SCHEDULE EVERY 1 DAY
 STARTS (TIMESTAMP(CURDATE()) + INTERVAL 1 DAY)
 DO
 BEGIN
   UPDATE tickets
-    SET estado = 'vencido'
-    WHERE fecha_reserva < CURRENT_DATE()
-      AND usado = 0
-      AND estado = 'activa';
+    SET estado = 'vencida'
+    WHERE fecha_reserva < CURDATE() 
+      AND estado = 'activa';       
 END$$
+
 DELIMITER ;
 
 DELIMITER $$
