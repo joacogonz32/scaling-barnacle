@@ -313,7 +313,7 @@ CREATE TABLE `tickets` (
   `fecha_reserva` date DEFAULT NULL,
   `hora_reserva` time DEFAULT NULL,
   `cantidad_personas` int DEFAULT NULL,
-  `estado` enum('activa','cancelada','vencida') DEFAULT NULL,
+  `estado` enum('activa','cancelada','vencida','usada') DEFAULT NULL,
   `id_info` int DEFAULT NULL,
   `id_evento` int DEFAULT NULL,
   PRIMARY KEY (`id_ticket`),
@@ -493,4 +493,5 @@ UNLOCK TABLES;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2025-11-24 20:22:35
+
 
